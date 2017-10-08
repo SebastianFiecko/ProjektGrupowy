@@ -1,83 +1,156 @@
 package kssr13.org.projektgrupowy;
-
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.os.Build;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
+import android.support.annotation.RequiresApi;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
-import kssr13.org.projektgrupowy.*;
+public class MainActivity extends Activity implements TextToSpeech.OnInitListener {
 
-public class MainActivity extends AppCompatActivity {
+    private TextToSpeech tts;
+    private Button speakOut;
+    private EditText txtText;
+    private Button navigationButton;
+    private Button informationButton;
+    private TextView capturedSpeechText;
+    private ImageButton speechToTextButton;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
 
-        private Toolbar toolbar;
-        private TabLayout tabLayout;
-        private ViewPager viewPager;
-        private int[] tabIcons = {
-                R.drawable.info_icon,
-                R.drawable.navigation_icon
-        };
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
+        tts = new TextToSpeech(this,this);
 
-            toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        capturedSpeechText = (TextView) findViewById(R.id.txtSpeechInput);
+        speechToTextButton = (ImageButton) findViewById(R.id.btnSpeak);
+        informationButton = (Button)findViewById(R.id.informationButton);
+        navigationButton = (Button)findViewById(R.id.navigationButton);
 
-            viewPager = (ViewPager) findViewById(R.id.viewpager);
-            setupViewPager(viewPager);
-
-            tabLayout = (TabLayout) findViewById(R.id.tabs);
-            tabLayout.setupWithViewPager(viewPager);
-            setupTabIcons();
-        }
-
-        private void setupTabIcons() {
-            tabLayout.getTabAt(0).setIcon(tabIcons[0]);
-            tabLayout.getTabAt(1).setIcon(tabIcons[1]);
-        }
-
-        private void setupViewPager(ViewPager viewPager) {
-            ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-            adapter.addFrag(new Navigation(), "NAVI");
-            adapter.addFrag(new Information(), "INFO");
-            viewPager.setAdapter(adapter);
-        }
-
-        class ViewPagerAdapter extends FragmentPagerAdapter {
-            private final List<Fragment> mFragmentList = new ArrayList<>();
-            private final List<String> mFragmentTitleList = new ArrayList<>();
-
-            public ViewPagerAdapter(FragmentManager manager) {
-                super(manager);
-            }
-
+        informationButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
-            public Fragment getItem(int position) {
-                return mFragmentList.get(position);
+            public void onClick(View view){
+                speakOut(informationButton);
             }
-
+        });
+        navigationButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
-            public int getCount() {
-                return mFragmentList.size();
+            public void onClick(View view){
+                speakOut(navigationButton);
             }
+        });
 
-            public void addFrag(Fragment fragment, String title) {
-                mFragmentList.add(fragment);
-                mFragmentTitleList.add(title);
-            }
-
+        speechToTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public CharSequence getPageTitle(int position) {
-                return mFragmentTitleList.get(position);
+            public void onClick(View v) {
+                promptSpeechInput();
+            }
+        });
+    }
+
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                getString(R.string.speech_prompt));
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.speech_not_supported),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        // Don't forget to shutdown tts!
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
+    /**
+     * Receiving speech input
+     * */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    capturedSpeechText.setText(result.get(0));
+                    //tutaj łapany jest tekst po konwersji go z powiedzianych bzdur, na dole
+                    //jest prosty przykład jak to sprawdzić - co zostało uchwycone
+                    /*
+                    if(capturedSpeechText.getText().equals("you"))
+                        capturedSpeechText.setTextColor(Color.RED);
+                    else
+                        capturedSpeechText.setTextColor(Color.BLUE);*/
+                }
+                break;
             }
         }
     }
+
+    /*
+    Checks if the library was initialized correctly and process with the Text-To-Speech
+    operation -> calls the speakOut()
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public void onInit(int status) {
+        if(status == TextToSpeech.SUCCESS){
+            int result = tts.setLanguage(Locale.US);
+            if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                Log.e("TTS","This language is not supported");
+            }else{
+                //btspk.setEnabled(true);
+                speakOut();
+            }
+        }else{ Log.e("TTS","Initialization failed");}
+    }
+
+    /*
+    Reads the editText field and process the speech generation process
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void speakOut(){
+        // CharSequence text2 = editText.getText();
+        // tts.speak(text2,TextToSpeech.QUEUE_FLUSH,null,"id1");
+    }
+
+    /*
+Reads the editText field and process the speech generation process
+ */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void speakOut(Button button){
+        CharSequence text2 = button.getText();
+        tts.speak(text2,TextToSpeech.QUEUE_FLUSH,null,"id1");
+    }
+}
+
