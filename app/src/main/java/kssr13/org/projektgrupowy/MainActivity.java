@@ -18,6 +18,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import io.realm.Realm;
+import kssr13.org.projektgrupowy.beacon.BeaconDatabaseHandler;
+
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener {
 
     private TextToSpeech tts;
@@ -27,6 +30,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private Button informationButton;
     private TextView capturedSpeechText;
     private ImageButton speechToTextButton;
+    private Button fillDbButton;
+    private Button deleteDbButton;
+    private Button printDbButton;
+    private BeaconDatabaseHandler beaconDatabaseHandler;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
     @Override
@@ -36,10 +43,18 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         tts = new TextToSpeech(this,this);
 
+        // Initialize Beacon database
+        Realm.init(this);
+        beaconDatabaseHandler = new BeaconDatabaseHandler();
+        Realm.setDefaultConfiguration(beaconDatabaseHandler.getConfig());
+
         capturedSpeechText = (TextView) findViewById(R.id.txtSpeechInput);
         speechToTextButton = (ImageButton) findViewById(R.id.btnSpeak);
         informationButton = (Button)findViewById(R.id.informationButton);
         navigationButton = (Button)findViewById(R.id.navigationButton);
+        fillDbButton = (Button) findViewById(R.id.fillDbButton);
+        deleteDbButton = (Button) findViewById(R.id.deleteDbButton);
+        printDbButton = (Button) findViewById(R.id.printDbButton);
 
         informationButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -60,6 +75,31 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             @Override
             public void onClick(View v) {
                 promptSpeechInput();
+            }
+        });
+
+        // For beacons database testing purposes
+        fillDbButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onClick(View view) {
+                beaconDatabaseHandler.fill();
+            }
+        });
+
+        deleteDbButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onClick(View view) {
+                beaconDatabaseHandler.purge();
+            }
+        });
+
+        printDbButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onClick(View view) {
+                beaconDatabaseHandler.printBeacons();
             }
         });
     }

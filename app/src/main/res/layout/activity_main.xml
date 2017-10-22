@@ -28,27 +28,24 @@
         android:layout_height="wrap_content"
         android:text="Information Mode"
         android:height="250dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:id="@+id/informationButton" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Navigation Mode"
-        android:height="250dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="350dp"
-        android:id="@+id/navigationButton" />
+        android:id="@+id/informationButton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/txtSpeechInput"
+        android:layout_alignEnd="@+id/txtSpeechInput"
+        android:layout_alignBottom="@+id/navigationButton" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="60dp"
         android:gravity="center"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:id="@+id/linearLayout2"
+        android:weightSum="1"
+        android:layout_above="@+id/btnSpeak"
+        android:layout_alignRight="@+id/txtSpeechInput"
+        android:layout_alignEnd="@+id/txtSpeechInput">
         <!--    <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,12 +63,71 @@
             android:layout_marginTop="200dp"
             android:id="@+id/button" />-->
 
-        <ImageButton
-            android:id="@+id/btnSpeak"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:src="@drawable/microphone" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/printDbButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Print DB"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/deleteDbButton"
+        android:layout_toRightOf="@+id/fillDbButton"
+        android:layout_toEndOf="@+id/fillDbButton"
+        android:layout_alignTop="@+id/fillDbButton" />
+
+    <Button
+        android:id="@+id/fillDbButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fill DB"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ImageButton
+        android:id="@+id/btnSpeak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:src="@drawable/microphone"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/deleteDbButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btnSpeak"
+        android:layout_toStartOf="@+id/btnSpeak"
+        android:layout_weight="0.10"
+        android:text="Del DB" />
+
+    <Button
+        android:id="@+id/navigationButton"
+        android:layout_width="306dp"
+        android:layout_height="95dp"
+        android:height="250dp"
+        android:text="Navigation Mode"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/txtSpeechInput"
+        android:layout_toEndOf="@+id/txtSpeechInput" />
+
+    <EditText
+        android:id="@+id/beaconsDbInfoText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/linearLayout2"
+        android:layout_toLeftOf="@+id/btnSpeak"
+        android:layout_toStartOf="@+id/btnSpeak"
+        android:inputType="none"
+        android:focusable="false"
+        android:ems="10"
+        android:text="Use these to test beacons DB"
+        android:textColor="@android:color/background_light" />
 
 </RelativeLayout>
