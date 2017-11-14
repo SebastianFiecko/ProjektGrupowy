@@ -1,7 +1,12 @@
 package kssr13.org.projektgrupowy;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
@@ -16,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -36,6 +42,14 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private BeaconDatabaseHandler beaconDatabaseHandler;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
+    public int device_nr = 0; /*<! Liczba wykrytych beaconów */
+    List<String> device_names = new ArrayList<String>(); /*<! Lista zawierająca nazwy wykrytych beaconów */
+    List<Short> device_rssi = new ArrayList<Short>(); /*<! Lista zawierająca moc sygnału wykrytych beaconów */
+
+    BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter(); //dodanie obiektu BluetoothAdapter o nazwie 'ba'
+    String final_device_names = new String();
+    public short final_device_rssi = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -55,6 +69,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         fillDbButton = (Button) findViewById(R.id.fillDbButton);
         deleteDbButton = (Button) findViewById(R.id.deleteDbButton);
         printDbButton = (Button) findViewById(R.id.printDbButton);
+
+        wykryjInne();
+
 
         informationButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -103,6 +120,77 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             }
         });
     }
+
+    /**
+     * Funkcja uruchamia metodę startDiscovery obiektu BluetoothAdapter oraz definiuje odbiorców podanych akcji
+     */
+    public void wykryjInne(){
+        Log.d("INFO","Szukam innych urządzeń (ok 12s)");
+        device_nr=0; //wyzerowanie licznika znalezionych beaconów przed rozpoczęciem kolejnego wyszukiwania
+        IntentFilter filtr = new IntentFilter(BluetoothDevice.ACTION_FOUND); //określnie akcji na jaką ma odbyć się reakcja. ACTION_FOUND - znaleziono urządzenie
+        this.registerReceiver(odbiorca, filtr); //określnie odbiorcy zdarzenia opisanego w 'filtr' - tzn. jeśli nastąpi akcja opisana w 'filtr' wykona się to co jest w 'odbiorca'
+        IntentFilter filtr2 = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); //określnie akcji na jaką ma odbyć się reakcja. ACTION_DISCOVERY_FINISHED - zakończenie wyszukiwania
+        this.registerReceiver(odbiorca2, filtr2); //określenie odbiorcy zdarzenia opisanego w 'filtr2'
+        ba.startDiscovery(); // uruchomienie metody startDiscovery obiektu BluetoothAdapter o nazwie 'ba' - rozpoczęcie skanowania urządzeń
+    }
+
+    /**
+     * Definicja obiektu BroadcastReceiver o nazwie 'odbiorca'
+     */
+    private final BroadcastReceiver odbiorca= new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent i) {
+            String akcja = 	i.getAction();
+            if(BluetoothDevice.ACTION_FOUND.equals(akcja)){ //jeśli wykryte zdarzenie to ACTION_FOUND
+                BluetoothDevice device = i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); //deklaracja nowego obiektu BluetoothDevice o nazwie 'device' - jeśli zostanie wykryte urządzenia to zostanie ono przypisane do tego obiektu
+                String device_name=device.getName(); //przypisanie nazwy urządzenia BT do zmiennej 'device_name'
+                short rssi = i.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE); //zapisanie mocy odebranego sygnału od urządzenia 'device' do zmiennej 'rssi'
+                Log.d("INFO","Znaleziono urządzenie: NR: "+device_nr+" Nazwa: "+device_name+" Siła sygnału: "+rssi);
+                //String check = device_name.substring(0,3); // wycięcie pierwszych trzech znaków z nazwy urządzenia
+                if(device_name.startsWith("eti") && (device_name != "null")){ //sprawdzenie czy nazwa urządzenia zaczyna się od "eti"
+                    device_names.add(device_nr,device_name); //dodanie nazwy urządzenia (beacona) do listy
+                    device_rssi.add(device_nr,rssi); //dodanie mocy sygnalu odb. do listy. indeks listy zaczyna się od "0"
+
+                    Log.d("INFO","Znaleziono beacona:  Nazwa: "+device_names.get(device_nr)+" Siła sygnału: "+device_rssi.get(device_nr) +" size "+device_names.size());
+                    //Wybór beacona o największej mocy
+                    if(device_nr==0) {
+                        final_device_names = device_names.get(device_nr);
+                        final_device_rssi = device_rssi.get(device_nr);
+                    }
+                    else{
+                        if (device_rssi.get(device_nr)>final_device_rssi){
+                            final_device_names = device_names.get(device_nr);
+                            final_device_rssi = device_rssi.get(device_nr);
+                        }
+                    }
+                    device_nr=device_nr+1; // zwiększenie licznika wykrytych urządzeń
+                }
+            }
+        }
+    };
+
+    /**
+     * Definicja obiektu BroadcastReceiver o nazwie 'odbiorca2'
+     */
+    private final BroadcastReceiver odbiorca2= new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent i) {
+            String akcja = 	i.getAction();
+            if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(akcja)){ //jeśli wykryte zdarzenie to ACTION_DISCOVERY_FINISHED
+                Log.d("INFO","Koniec skanowania. Urządzenia: ");
+
+                for(int j=0; j<device_nr; j++){
+                    Log.d("INFO","Nazwa: "+device_names.get(j)+" RSSI: "+device_rssi.get(j));
+                } //wyświetlenie wszystkich znalezionych urządzeń w tym cyklu
+                Log.d("INFO","FINAL BEACON :  Nazwa: "+final_device_names+" Siła sygnału: "+final_device_rssi);
+                device_nr=0; // wyzerowanie znalezionych urządzeń
+                device_names.clear();
+                device_rssi.clear();
+                Log.d("INFO","Rozpoczynam skanowanie");
+                ba.startDiscovery(); //rozpoczęcie kolejnego skanowaniu w poszukiwaniu beaconów
+            }
+        }
+    };
 
     private void promptSpeechInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
