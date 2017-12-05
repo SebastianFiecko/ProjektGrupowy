@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DbData xmlns:android="http://schemas.android.com/apk/res/android">
+    <Routes>
+        <Route id="1" name="Library"/>
+        <Route id="2" name="Dean's office"/>
+        <Route id="3" name="Science lab"/>
+        <Route id="4" name="Canteen - Pasibrzuch"/>
+        <Route id="5" name="Toilet"/>
+        <Route id="6" name="Cloakroom"/>
+    </Routes>
+
+    <Beacons>
+        <Beacon id="eti_1" infoText="Library">
+            <RouteInfo routeId="1">Go straight on for twenty meters</RouteInfo>
+            <RouteInfo routeId="2">Go straight on for ten metres and turn right</RouteInfo>
+            <RouteInfo routeId="3">Go straight on for ten metres and turn left</RouteInfo>
+            <RouteInfo routeId="4">Go straight on for twenty metres</RouteInfo>
+            <RouteInfo routeId="5">Go straight on for twenty metres</RouteInfo>
+        </Beacon>
+        <Beacon id="eti_2" infoText="Canteen - Pasibrzuch">
+            <RouteInfo routeId="1">Turn right and go straight on for ten meters</RouteInfo>
+            <RouteInfo routeId="2">Go straight on for five metres and turn right</RouteInfo>
+            <RouteInfo routeId="3">Go straight on for five metres and turn left</RouteInfo>
+            <RouteInfo routeId="4">Watch out – stairs, gently turn left</RouteInfo>
+            <RouteInfo routeId="5">Turn left and go for five meters</RouteInfo>
+        </Beacon>
+        <Beacon id="eti_3" infoText="Cloakroom">
+            <RouteInfo routeId="1">Doors - enter the room, turn right</RouteInfo>
+            <RouteInfo routeId="2">Elevator – come on in, choose first floor</RouteInfo>
+            <RouteInfo routeId="3">Elevator – come on in, choose second floor</RouteInfo>
+            <RouteInfo routeId="4">Get through the door and go straigh on for five meters</RouteInfo>
+            <RouteInfo routeId="5">Men’s room on the left, go straight on for one meter to Women’ room</RouteInfo>
+        </Beacon>
+        <Beacon id="eti_4" infoText="Dean’s office">
+            <RouteInfo routeId="1">Library’s reception</RouteInfo>
+            <RouteInfo routeId="2"> Turn left, get through the door and turn left, go straight on for five meters, final destination on the left</RouteInfo>
+            <RouteInfo routeId="3"> Turn left, get through the door and turn left, go straight on for five meters, final destination on the left</RouteInfo>
+            <RouteInfo routeId="4">Canteen’s cash desk</RouteInfo>
+            <RouteInfo routeId="5">Women’s room</RouteInfo>
+        </Beacon>
+    </Beacons>
+</DbData>

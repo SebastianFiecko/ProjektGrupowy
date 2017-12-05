@@ -7,11 +7,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.XmlResourceParser;
 import android.os.Build;
+import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.RequiresApi;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
-import kssr13.org.projektgrupowy.beacon.BeaconDatabaseHandler;
+import kssr13.org.projektgrupowy.beacon.DbHandler;
 
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener {
 
@@ -39,7 +40,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private Button fillDbButton;
     private Button deleteDbButton;
     private Button printDbButton;
-    private BeaconDatabaseHandler beaconDatabaseHandler;
+    private DbHandler dbHandler;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
     public int device_nr = 0; /*<! Liczba wykrytych beaconów */
@@ -59,8 +60,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         // Initialize Beacon database
         Realm.init(this);
-        beaconDatabaseHandler = new BeaconDatabaseHandler();
-        Realm.setDefaultConfiguration(beaconDatabaseHandler.getConfig());
+        dbHandler = new DbHandler();
+        Realm.setDefaultConfiguration(dbHandler.getConfig());
 
         capturedSpeechText = (TextView) findViewById(R.id.txtSpeechInput);
         speechToTextButton = (ImageButton) findViewById(R.id.btnSpeak);
@@ -100,7 +101,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
-                beaconDatabaseHandler.fill();
+                XmlResourceParser parser = getResources().getXml(R.xml.db_initial_data);
+                dbHandler.initalize(parser);
             }
         });
 
@@ -108,7 +110,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
-                beaconDatabaseHandler.purge();
+                dbHandler.purge();
             }
         });
 
@@ -116,7 +118,32 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
-                beaconDatabaseHandler.printBeacons();
+                dbHandler.printBeacons();
+                dbHandler.printRoutes();
+
+                String beaconId = "eti_1";
+                Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
+                        beaconId, dbHandler.getBeaconInfo(beaconId)));
+
+                String route = "Toilet";
+                Log.d("[DbTest]", String.format("%s routeId: %d",
+                        route, dbHandler.getRoute(route).getRouteId()));
+
+                int routeId = 5;
+                Log.d("[DbTest]", String.format("RouteId %d name: \"%s\"",
+                        routeId, dbHandler.getRoute(routeId).getName()));
+
+                beaconId = "eti_2";
+                routeId = 2;
+                Log.d("[DbTest]", String.format("Beacon %s routeId %d info: \"%s\"",
+                        beaconId, routeId, dbHandler.getRouteForBeacon(beaconId, routeId)));
+
+                beaconId = "eti_3";
+                route = "Dean's office";
+                routeId = dbHandler.getRoute(route).getRouteId();
+                Log.d("[DbTest]", String.format("Beacon %s route %s info: %s",
+                        beaconId, route, dbHandler.getRouteForBeacon(beaconId, routeId)));
+
             }
         });
     }
