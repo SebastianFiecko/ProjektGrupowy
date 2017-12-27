@@ -121,28 +121,31 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 dbHandler.printBeacons();
                 dbHandler.printRoutes();
 
-                String beaconId = "eti_1";
-                Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
-                        beaconId, dbHandler.getBeaconInfo(beaconId)));
+                try {
+                    String beaconId = "eti_1";
+                    Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
+                            beaconId, dbHandler.getBeaconInfo(beaconId)));
 
-                String route = "Toilet";
-                Log.d("[DbTest]", String.format("%s routeId: %d",
-                        route, dbHandler.getRoute(route).getRouteId()));
+                    String route = "Toilet";
+                    Log.d("[DbTest]", String.format("%s routeId: %d",
+                            route, dbHandler.getRoute(route).getRouteId()));
 
-                int routeId = 5;
-                Log.d("[DbTest]", String.format("RouteId %d name: \"%s\"",
-                        routeId, dbHandler.getRoute(routeId).getName()));
+                    int routeId = 5;
+                    Log.d("[DbTest]", String.format("RouteId %d name: \"%s\"",
+                            routeId, dbHandler.getRoute(routeId).getName()));
 
-                beaconId = "eti_2";
-                routeId = 2;
-                Log.d("[DbTest]", String.format("Beacon %s routeId %d info: \"%s\"",
-                        beaconId, routeId, dbHandler.getRouteForBeacon(beaconId, routeId)));
+                    beaconId = "eti_2";
+                    routeId = 2;
+                    Log.d("[DbTest]", String.format("Beacon %s routeId %d info: \"%s\"",
+                            beaconId, routeId, dbHandler.getRouteForBeacon(beaconId, routeId)));
 
-                beaconId = "eti_3";
-                route = "Dean's office";
-                routeId = dbHandler.getRoute(route).getRouteId();
-                Log.d("[DbTest]", String.format("Beacon %s route %s info: %s",
-                        beaconId, route, dbHandler.getRouteForBeacon(beaconId, routeId)));
+                    beaconId = "eti_3";
+                    route = "Dean's office";
+                    routeId = dbHandler.getRoute(route).getRouteId();
+                    Log.d("[DbTest]", String.format("Beacon %s route %s info: %s",
+                            beaconId, route, dbHandler.getRouteForBeacon(beaconId, routeId)));
+                } catch (NullPointerException ignored) {
+                }
 
             }
         });

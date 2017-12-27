@@ -30,8 +30,6 @@ public class DbHandler {
     }
 
     public void initalize(XmlResourceParser parser) {
-
-        realm = Realm.getInstance(CONFIG);
         try {
             dbInitializer.initialize(parser);
         } catch (IOException e) {
@@ -188,6 +186,7 @@ public class DbHandler {
         realm.close();
         Realm.deleteRealm(CONFIG);
         Log.d(LOG_TAG, "Beacons database dropped");
+        realm = Realm.getInstance(CONFIG);
     }
 
     public RealmConfiguration getConfig() {
