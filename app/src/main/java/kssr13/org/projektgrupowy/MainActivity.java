@@ -121,24 +121,47 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 dbHandler.printBeacons();
                 dbHandler.printRoutes();
 
+
+                /* Przykładowe zapytania do bazy */
                 try {
+
+                    /* przykład 1
+                     * Pobierz info text na podstawie ID beacona
+                     * dla "eti_1" powinno wypisać "Library"
+                     */
                     String beaconId = "eti_1";
                     Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
                             beaconId, dbHandler.getBeaconInfo(beaconId)));
 
+                    /* przykład 2
+                     * Pobierz ID trasy na podstawie celu trasy
+                     * dla celu trasy "Toilet" powinno wypisać ID "5"
+                     */
                     String route = "Toilet";
                     Log.d("[DbTest]", String.format("%s routeId: %d",
                             route, dbHandler.getRoute(route).getRouteId()));
 
+                    /* przykład 3
+                     * Pobierz cel trasy na podstawie ID trasy
+                     * dla trasy "5" powinno wypisać cel "Toilet"
+                     */
                     int routeId = 5;
                     Log.d("[DbTest]", String.format("RouteId %d name: \"%s\"",
                             routeId, dbHandler.getRoute(routeId).getName()));
 
+                    /* przykład 4
+                     * Pobierz komunikat z trybu nawigacji na podstawie ID beacona i ID trasy
+                     * dla "eti_2" i trasy o ID "2" powinno wypisać "Go straight on for five metres and turn right"
+                     */
                     beaconId = "eti_2";
                     routeId = 2;
                     Log.d("[DbTest]", String.format("Beacon %s routeId %d info: \"%s\"",
                             beaconId, routeId, dbHandler.getRouteForBeacon(beaconId, routeId)));
 
+                    /* przykład 5
+                     * Pobierz komunikat z trybu nawigacji na podstawie ID beacona i celu trasy
+                     * dla "eti_3" i trasy o celu "Dean's office" powinno wypisać "Elevator – come on in, choose first floor"
+                     */
                     beaconId = "eti_3";
                     route = "Dean's office";
                     routeId = dbHandler.getRoute(route).getRouteId();
