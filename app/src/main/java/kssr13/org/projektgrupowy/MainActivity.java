@@ -1,4 +1,5 @@
 package kssr13.org.projektgrupowy;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -43,6 +44,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private DbHandler dbHandler;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
+
     public int device_nr = 0; /*<! Liczba wykrytych beaconów */
     List<String> device_names = new ArrayList<String>(); /*<! Lista zawierająca nazwy wykrytych beaconów */
     List<Short> device_rssi = new ArrayList<Short>(); /*<! Lista zawierająca moc sygnału wykrytych beaconów */
@@ -50,13 +52,19 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter(); //dodanie obiektu BluetoothAdapter o nazwie 'ba'
     String final_device_names = new String();
     public short final_device_rssi = 0;
+    public String last_final_device_name = new String();
 
+    public int mode = 0;
+    public final int INFORMATION = 1;
+    public final int NAVIGATION = 2;
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tts = new TextToSpeech(this,this);
+        tts = new TextToSpeech(this, this);
 
         // Initialize Beacon database
         Realm.init(this);
@@ -65,27 +73,33 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         capturedSpeechText = (TextView) findViewById(R.id.txtSpeechInput);
         speechToTextButton = (ImageButton) findViewById(R.id.btnSpeak);
-        informationButton = (Button)findViewById(R.id.informationButton);
-        navigationButton = (Button)findViewById(R.id.navigationButton);
+        informationButton = (Button) findViewById(R.id.informationButton);
+        navigationButton = (Button) findViewById(R.id.navigationButton);
         fillDbButton = (Button) findViewById(R.id.fillDbButton);
         deleteDbButton = (Button) findViewById(R.id.deleteDbButton);
         printDbButton = (Button) findViewById(R.id.printDbButton);
 
+
         wykryjInne();
+
 
 
         informationButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 speakOut(informationButton);
+                mode = INFORMATION;
+                informationMode();
             }
         });
         navigationButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 speakOut(navigationButton);
+                mode = NAVIGATION;
+                navigationMode();
             }
         });
 
@@ -129,7 +143,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                      * Pobierz info text na podstawie ID beacona
                      * dla "eti_1" powinno wypisać "Library"
                      */
-                    String beaconId = "eti_1";
+                    String beaconId = "eti_01";
                     Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
                             beaconId, dbHandler.getBeaconInfo(beaconId)));
 
@@ -174,12 +188,34 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void navigationMode() {
+        while (tts.isSpeaking()){       // odczekanie aż babeczka skończy gadać
+
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void informationMode() {
+        while (tts.isSpeaking()){       // odczekanie aż babeczka skończy gadać
+
+        }
+        try {
+        String beaconId = final_device_names;
+        Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
+                beaconId, dbHandler.getBeaconInfo(beaconId)));
+        String beaconInfoText = dbHandler.getBeaconInfo(beaconId);
+        speakOut("You are here: " + beaconInfoText);
+        } catch (NullPointerException ignored) {
+        }
+    }
+
     /**
      * Funkcja uruchamia metodę startDiscovery obiektu BluetoothAdapter oraz definiuje odbiorców podanych akcji
      */
-    public void wykryjInne(){
-        Log.d("INFO","Szukam innych urządzeń (ok 12s)");
-        device_nr=0; //wyzerowanie licznika znalezionych beaconów przed rozpoczęciem kolejnego wyszukiwania
+    public void wykryjInne() {
+        Log.d("INFO", "Szukam innych urządzeń (ok 12s)");
+        device_nr = 0; //wyzerowanie licznika znalezionych beaconów przed rozpoczęciem kolejnego wyszukiwania
         IntentFilter filtr = new IntentFilter(BluetoothDevice.ACTION_FOUND); //określnie akcji na jaką ma odbyć się reakcja. ACTION_FOUND - znaleziono urządzenie
         this.registerReceiver(odbiorca, filtr); //określnie odbiorcy zdarzenia opisanego w 'filtr' - tzn. jeśli nastąpi akcja opisana w 'filtr' wykona się to co jest w 'odbiorca'
         IntentFilter filtr2 = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); //określnie akcji na jaką ma odbyć się reakcja. ACTION_DISCOVERY_FINISHED - zakończenie wyszukiwania
@@ -190,33 +226,32 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     /**
      * Definicja obiektu BroadcastReceiver o nazwie 'odbiorca'
      */
-    private final BroadcastReceiver odbiorca= new BroadcastReceiver() {
+    private final BroadcastReceiver odbiorca = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent i) {
-            String akcja = 	i.getAction();
-            if(BluetoothDevice.ACTION_FOUND.equals(akcja)){ //jeśli wykryte zdarzenie to ACTION_FOUND
+            String akcja = i.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(akcja)) { //jeśli wykryte zdarzenie to ACTION_FOUND
                 BluetoothDevice device = i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE); //deklaracja nowego obiektu BluetoothDevice o nazwie 'device' - jeśli zostanie wykryte urządzenia to zostanie ono przypisane do tego obiektu
-                String device_name=device.getName(); //przypisanie nazwy urządzenia BT do zmiennej 'device_name'
-                short rssi = i.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE); //zapisanie mocy odebranego sygnału od urządzenia 'device' do zmiennej 'rssi'
-                Log.d("INFO","Znaleziono urządzenie: NR: "+device_nr+" Nazwa: "+device_name+" Siła sygnału: "+rssi);
+                String device_name = device.getName(); //przypisanie nazwy urządzenia BT do zmiennej 'device_name'
+                short rssi = i.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE); //zapisanie mocy odebranego sygnału od urządzenia 'device' do zmiennej 'rssi'
+                Log.d("INFO", "Znaleziono urządzenie: NR: " + device_nr + " Nazwa: " + device_name + " Siła sygnału: " + rssi);
                 //String check = device_name.substring(0,3); // wycięcie pierwszych trzech znaków z nazwy urządzenia
-                if(device_name.startsWith("eti") && (device_name != "null")){ //sprawdzenie czy nazwa urządzenia zaczyna się od "eti"
-                    device_names.add(device_nr,device_name); //dodanie nazwy urządzenia (beacona) do listy
-                    device_rssi.add(device_nr,rssi); //dodanie mocy sygnalu odb. do listy. indeks listy zaczyna się od "0"
+                if (device_name.startsWith("eti") && (device_name != "null")) { //sprawdzenie czy nazwa urządzenia zaczyna się od "eti"
+                    device_names.add(device_nr, device_name); //dodanie nazwy urządzenia (beacona) do listy
+                    device_rssi.add(device_nr, rssi); //dodanie mocy sygnalu odb. do listy. indeks listy zaczyna się od "0"
 
-                    Log.d("INFO","Znaleziono beacona:  Nazwa: "+device_names.get(device_nr)+" Siła sygnału: "+device_rssi.get(device_nr) +" size "+device_names.size());
+                    Log.d("INFO", "Znaleziono beacona:  Nazwa: " + device_names.get(device_nr) + " Siła sygnału: " + device_rssi.get(device_nr) + " size " + device_names.size());
                     //Wybór beacona o największej mocy
-                    if(device_nr==0) {
+                    if (device_nr == 0) {
                         final_device_names = device_names.get(device_nr);
                         final_device_rssi = device_rssi.get(device_nr);
-                    }
-                    else{
-                        if (device_rssi.get(device_nr)>final_device_rssi){
+                    } else {
+                        if (device_rssi.get(device_nr) > final_device_rssi) {
                             final_device_names = device_names.get(device_nr);
                             final_device_rssi = device_rssi.get(device_nr);
                         }
                     }
-                    device_nr=device_nr+1; // zwiększenie licznika wykrytych urządzeń
+                    device_nr = device_nr + 1; // zwiększenie licznika wykrytych urządzeń
                 }
             }
         }
@@ -225,21 +260,26 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     /**
      * Definicja obiektu BroadcastReceiver o nazwie 'odbiorca2'
      */
-    private final BroadcastReceiver odbiorca2= new BroadcastReceiver() {
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private final BroadcastReceiver odbiorca2 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent i) {
-            String akcja = 	i.getAction();
-            if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(akcja)){ //jeśli wykryte zdarzenie to ACTION_DISCOVERY_FINISHED
-                Log.d("INFO","Koniec skanowania. Urządzenia: ");
+            String akcja = i.getAction();
+            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(akcja)) { //jeśli wykryte zdarzenie to ACTION_DISCOVERY_FINISHED
+                Log.d("INFO", "Koniec skanowania. Urządzenia: ");
 
-                for(int j=0; j<device_nr; j++){
-                    Log.d("INFO","Nazwa: "+device_names.get(j)+" RSSI: "+device_rssi.get(j));
+                for (int j = 0; j < device_nr; j++) {
+                    Log.d("INFO", "Nazwa: " + device_names.get(j) + " RSSI: " + device_rssi.get(j));
                 } //wyświetlenie wszystkich znalezionych urządzeń w tym cyklu
-                Log.d("INFO","FINAL BEACON :  Nazwa: "+final_device_names+" Siła sygnału: "+final_device_rssi);
-                device_nr=0; // wyzerowanie znalezionych urządzeń
+                Log.d("INFO", "FINAL BEACON :  Nazwa: " + final_device_names + " Siła sygnału: " + final_device_rssi);
+                if (mode == INFORMATION && !last_final_device_name.equals(final_device_names)) { //TODO: ??
+                    informationMode();
+                }
+                last_final_device_name = final_device_names;
+                device_nr = 0; // wyzerowanie znalezionych urządzeń
                 device_names.clear();
                 device_rssi.clear();
-                Log.d("INFO","Rozpoczynam skanowanie");
+                Log.d("INFO", "Rozpoczynam skanowanie");
                 ba.startDiscovery(); //rozpoczęcie kolejnego skanowaniu w poszukiwaniu beaconów
             }
         }
@@ -273,7 +313,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     /**
      * Receiving speech input
-     * */
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -305,22 +345,24 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onInit(int status) {
-        if(status == TextToSpeech.SUCCESS){
+        if (status == TextToSpeech.SUCCESS) {
             int result = tts.setLanguage(Locale.US);
-            if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
-                Log.e("TTS","This language is not supported");
-            }else{
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS", "This language is not supported");
+            } else {
                 //btspk.setEnabled(true);
                 speakOut();
             }
-        }else{ Log.e("TTS","Initialization failed");}
+        } else {
+            Log.e("TTS", "Initialization failed");
+        }
     }
 
     /*
     Reads the editText field and process the speech generation process
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void speakOut(){
+    private void speakOut() {
         // CharSequence text2 = editText.getText();
         // tts.speak(text2,TextToSpeech.QUEUE_FLUSH,null,"id1");
     }
@@ -329,9 +371,16 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 Reads the editText field and process the speech generation process
  */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void speakOut(Button button){
+    private void speakOut(Button button) {
         CharSequence text2 = button.getText();
-        tts.speak(text2,TextToSpeech.QUEUE_FLUSH,null,"id1");
+        tts.speak(text2, TextToSpeech.QUEUE_FLUSH, null, "id1");
+    }
+
+    /*
+    Reads text sent to this function
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void speakOut(String text) {
+        tts.speak(text, TextToSpeech.QUEUE_ADD, null, "id1");
     }
 }
-
