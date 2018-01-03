@@ -58,6 +58,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public final int INFORMATION = 1;
     public final int NAVIGATION = 2;
 
+    public boolean textCaptured = false;
+
+    public int routeId = 0;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -188,24 +192,63 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         });
     }
 
+    /*
+    Funkcja rozpoczynająca tryb nawigacyjny. Czytane są możliwe cele oraz następuje wybór celu.
+     */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void navigationMode() {
+        textCaptured = false;
+        routeId = 0;
+        speakOut("Choose a destination. Available options: "+dbHandler.getAllDestinations());
         while (tts.isSpeaking()){       // odczekanie aż babeczka skończy gadać
 
+        }
+        promptSpeechInput();
+    }
+
+    /*
+    Funkcja, która kontynuuje tryb nawigacyjny. Sprawdzane jest, czy wybrany cel podróży jest możliwy do osiągnięcia.
+    Jeśli tak - następuje nakierowanie na trasę.
+    Jeśli nie - następuje ponowne wyczytanie możliwych celów i oczekiwanie na wybór jednego z nich.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void navigationModeContinued(String text) {
+        routeId = dbHandler.getRouteIfExists(text);
+        Log.d("[ROUTEtest]", String.format("Route %s", routeId));
+        if (routeId == 0) {
+            speakOut("Wrong destination.");
+            navigationMode();
+        }
+        navigating();
+    }
+
+    /*
+    Funkcja nawigująca aż do osiągnięcia celu.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void navigating() {
+        speakOut(dbHandler.getRouteForBeacon(final_device_names, routeId));
+        if (dbHandler.getRoute(routeId).getName().equals(dbHandler.getBeaconInfo(final_device_names))) {
+            speakOut("You have reached your destination.");
+            textCaptured = false;
+            mode = 0;
+            routeId = 0;
         }
     }
 
+    /*
+    Funkcja obsługująca tryb informacyjny.
+     */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void informationMode() {
-        while (tts.isSpeaking()){       // odczekanie aż babeczka skończy gadać
-
-        }
+        textCaptured = false;
+        routeId = 0;
         try {
         String beaconId = final_device_names;
-        Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
+        Log.d("[InfoTest]", String.format("Beacon %s infoText: \"%s\"",
                 beaconId, dbHandler.getBeaconInfo(beaconId)));
         String beaconInfoText = dbHandler.getBeaconInfo(beaconId);
-        speakOut("You are here: " + beaconInfoText);
+        speakOut("You are near " + beaconInfoText);
         } catch (NullPointerException ignored) {
         }
     }
@@ -272,8 +315,11 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                     Log.d("INFO", "Nazwa: " + device_names.get(j) + " RSSI: " + device_rssi.get(j));
                 } //wyświetlenie wszystkich znalezionych urządzeń w tym cyklu
                 Log.d("INFO", "FINAL BEACON :  Nazwa: " + final_device_names + " Siła sygnału: " + final_device_rssi);
-                if (mode == INFORMATION && !last_final_device_name.equals(final_device_names)) { //TODO: ??
+                if (mode == INFORMATION && !last_final_device_name.equals(final_device_names)) {
                     informationMode();
+                }
+                if (mode == NAVIGATION && !last_final_device_name.equals(final_device_names) && routeId != 0) {
+                    navigating();
                 }
                 last_final_device_name = final_device_names;
                 device_nr = 0; // wyzerowanie znalezionych urządzeń
@@ -314,6 +360,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     /**
      * Receiving speech input
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -321,10 +368,11 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
-
+                    textCaptured = true;
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     capturedSpeechText.setText(result.get(0));
+                    navigationModeContinued(result.get(0));
                     //tutaj łapany jest tekst po konwersji go z powiedzianych bzdur, na dole
                     //jest prosty przykład jak to sprawdzić - co zostało uchwycone
                     /*

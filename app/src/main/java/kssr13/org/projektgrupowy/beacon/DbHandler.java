@@ -130,6 +130,15 @@ public class DbHandler {
             return realm.where(RouteRealm.class).equalTo("name", name).findFirst();
     }
 
+    public int getRouteIfExists(String name) {
+        RouteRealm r = realm.where(RouteRealm.class).equalTo("name", name).findFirst();
+        if (r == null) {
+            return 0;
+        }
+
+        return r.getRouteId();
+    }
+
     public void putRoute(final String name, final int id) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -176,6 +185,19 @@ public class DbHandler {
         for (RouteRealm r : routes) {
             Log.d(LOG_TAG, String.format("%d     %s", r.getRouteId(), r.getName()));
         }
+    }
+
+    public String getAllDestinations() {
+        String allDestinations = "";
+        final RealmResults<RouteRealm> routes = realm.where(RouteRealm.class).findAll();
+        if (routes.isEmpty()) {
+            Log.d(LOG_TAG, "No routes found in database");
+            return "null";
+        }
+        for (RouteRealm r : routes) {
+            allDestinations+=r.getName()+", ";
+        }
+        return allDestinations;
     }
 
     public String getRealmDbPath() {
