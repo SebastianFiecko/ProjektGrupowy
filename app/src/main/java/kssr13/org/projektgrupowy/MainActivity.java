@@ -36,7 +36,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     //private EditText txtText;
     private Button navigationButton;
     private Button informationButton;
-    //private TextView capturedSpeechText;
+    //private TextView capturedSpeechText;a
     //private ImageButton speechToTextButton;
     //private Button fillDbButton;
     //private Button deleteDbButton;
