@@ -1,135 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@drawable/backgroud_gradient_colors"
-    android:screenOrientation="portrait"
+    android:orientation="vertical"
     tools:context="kssr13.org.projektgrupowy.MainActivity">
 
-    <TextView
-        android:id="@+id/txtSpeechInput"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/white"
-        android:textSize="26dp"
-        android:textStyle="normal" />
-
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Information Mode"
-        android:height="250dp"
         android:id="@+id/informationButton"
-        android:layout_alignTop="@+id/navigationButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/linearLayout2"
-        android:layout_alignEnd="@+id/linearLayout2"
-        android:layout_above="@+id/linearLayout2" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:id="@+id/linearLayout2"
-        android:weightSum="1"
-        android:layout_above="@+id/btnSpeak"
-        android:layout_alignRight="@+id/txtSpeechInput"
-        android:layout_alignEnd="@+id/txtSpeechInput">
-        <!--    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/editText2"
-            android:hint="enter text"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="100dp" />
-
-    <Button
-            android:text="SpeakOut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="200dp"
-            android:id="@+id/button" />-->
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/printDbButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Print DB"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/deleteDbButton"
-        android:layout_toRightOf="@+id/fillDbButton"
-        android:layout_toEndOf="@+id/fillDbButton"
-        android:layout_alignTop="@+id/fillDbButton" />
-
-    <Button
-        android:id="@+id/fillDbButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fill DB"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <ImageButton
-        android:id="@+id/btnSpeak"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:src="@drawable/microphone"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:id="@+id/deleteDbButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/btnSpeak"
-        android:layout_toStartOf="@+id/btnSpeak"
-        android:layout_weight="0.10"
-        android:text="Del DB" />
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:text="Information Mode" />
 
     <Button
         android:id="@+id/navigationButton"
-        android:layout_width="306dp"
-        android:layout_height="95dp"
-        android:height="250dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:text="Navigation Mode"
-        android:layout_below="@+id/txtSpeechInput"
-        android:layout_toRightOf="@+id/txtSpeechInput"
-        android:layout_toEndOf="@+id/txtSpeechInput"
-        android:layout_marginTop="56dp"
-        android:layout_above="@+id/linearLayout2" />
+        android:layout_weight="0.5" />
 
-    <EditText
-        android:id="@+id/beaconsDbInfoText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/linearLayout2"
-        android:layout_toLeftOf="@+id/btnSpeak"
-        android:layout_toStartOf="@+id/btnSpeak"
-        android:inputType="none"
-        android:focusable="false"
-        android:ems="10"
-        android:text="Use these to test beacons DB"
-        android:textColor="@android:color/background_light" />
-
-</RelativeLayout>
+</LinearLayout>

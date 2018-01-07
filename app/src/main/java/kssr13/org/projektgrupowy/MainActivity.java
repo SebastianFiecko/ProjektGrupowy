@@ -32,15 +32,15 @@ import kssr13.org.projektgrupowy.beacon.DbHandler;
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener {
 
     private TextToSpeech tts;
-    private Button speakOut;
-    private EditText txtText;
+    //private Button speakOut;
+    //private EditText txtText;
     private Button navigationButton;
     private Button informationButton;
-    private TextView capturedSpeechText;
-    private ImageButton speechToTextButton;
-    private Button fillDbButton;
-    private Button deleteDbButton;
-    private Button printDbButton;
+    //private TextView capturedSpeechText;
+    //private ImageButton speechToTextButton;
+    //private Button fillDbButton;
+    //private Button deleteDbButton;
+    //private Button printDbButton;
     private DbHandler dbHandler;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
@@ -75,13 +75,13 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         dbHandler = new DbHandler();
         Realm.setDefaultConfiguration(dbHandler.getConfig());
 
-        capturedSpeechText = (TextView) findViewById(R.id.txtSpeechInput);
-        speechToTextButton = (ImageButton) findViewById(R.id.btnSpeak);
+        //capturedSpeechText = (TextView) findViewById(R.id.txtSpeechInput);
+        //speechToTextButton = (ImageButton) findViewById(R.id.btnSpeak);
         informationButton = (Button) findViewById(R.id.informationButton);
         navigationButton = (Button) findViewById(R.id.navigationButton);
-        fillDbButton = (Button) findViewById(R.id.fillDbButton);
-        deleteDbButton = (Button) findViewById(R.id.deleteDbButton);
-        printDbButton = (Button) findViewById(R.id.printDbButton);
+        //fillDbButton = (Button) findViewById(R.id.fillDbButton);
+        //deleteDbButton = (Button) findViewById(R.id.deleteDbButton);
+        //printDbButton = (Button) findViewById(R.id.printDbButton);
 
 
         wykryjInne();
@@ -107,80 +107,80 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             }
         });
 
-        speechToTextButton.setOnClickListener(new View.OnClickListener() {
+        /*speechToTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 promptSpeechInput();
             }
-        });
+        });*/
 
         // For beacons database testing purposes
-        fillDbButton.setOnClickListener(new View.OnClickListener() {
+        /*fillDbButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
                 XmlResourceParser parser = getResources().getXml(R.xml.db_initial_data);
                 dbHandler.initalize(parser);
             }
-        });
+        });*/
 
-        deleteDbButton.setOnClickListener(new View.OnClickListener() {
+        /*deleteDbButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
                 dbHandler.purge();
             }
-        });
+        });*/
 
-        printDbButton.setOnClickListener(new View.OnClickListener() {
+        /*printDbButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
                 dbHandler.printBeacons();
-                dbHandler.printRoutes();
+                dbHandler.printRoutes();*/
 
 
                 /* Przykładowe zapytania do bazy */
-                try {
+                //try {
 
                     /* przykład 1
                      * Pobierz info text na podstawie ID beacona
                      * dla "eti_1" powinno wypisać "Library"
                      */
-                    String beaconId = "eti_01";
+                    /*String beaconId = "eti_01";
                     Log.d("[DbTest]", String.format("Beacon %s infoText: \"%s\"",
-                            beaconId, dbHandler.getBeaconInfo(beaconId)));
+                            beaconId, dbHandler.getBeaconInfo(beaconId)));*/
 
                     /* przykład 2
                      * Pobierz ID trasy na podstawie celu trasy
                      * dla celu trasy "Toilet" powinno wypisać ID "5"
                      */
-                    String route = "Toilet";
+                    /*String route = "Toilet";
                     Log.d("[DbTest]", String.format("%s routeId: %d",
-                            route, dbHandler.getRoute(route).getRouteId()));
+                            route, dbHandler.getRoute(route).getRouteId()));*/
 
                     /* przykład 3
                      * Pobierz cel trasy na podstawie ID trasy
                      * dla trasy "5" powinno wypisać cel "Toilet"
                      */
-                    int routeId = 5;
+                    /*int routeId = 5;
                     Log.d("[DbTest]", String.format("RouteId %d name: \"%s\"",
-                            routeId, dbHandler.getRoute(routeId).getName()));
+                            routeId, dbHandler.getRoute(routeId).getName()));*/
 
                     /* przykład 4
                      * Pobierz komunikat z trybu nawigacji na podstawie ID beacona i ID trasy
                      * dla "eti_2" i trasy o ID "2" powinno wypisać "Go straight on for five metres and turn right"
                      */
-                    beaconId = "eti_2";
+                    /*beaconId = "eti_2";
                     routeId = 2;
                     Log.d("[DbTest]", String.format("Beacon %s routeId %d info: \"%s\"",
-                            beaconId, routeId, dbHandler.getRouteForBeacon(beaconId, routeId)));
+                            beaconId, routeId, dbHandler.getRouteForBeacon(beaconId, routeId)));*/
 
                     /* przykład 5
                      * Pobierz komunikat z trybu nawigacji na podstawie ID beacona i celu trasy
                      * dla "eti_3" i trasy o celu "Dean's office" powinno wypisać "Elevator – come on in, choose first floor"
                      */
-                    beaconId = "eti_3";
+                    /*beaconId = "eti_3";
                     route = "Dean's office";
                     routeId = dbHandler.getRoute(route).getRouteId();
                     Log.d("[DbTest]", String.format("Beacon %s route %s info: %s",
@@ -189,7 +189,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 }
 
             }
-        });
+        });*/
     }
 
     /*
@@ -371,7 +371,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                     textCaptured = true;
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    capturedSpeechText.setText(result.get(0));
+                    //capturedSpeechText.setText(result.get(0));
                     navigationModeContinued(result.get(0));
                     //tutaj łapany jest tekst po konwersji go z powiedzianych bzdur, na dole
                     //jest prosty przykład jak to sprawdzić - co zostało uchwycone
