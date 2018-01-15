@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class SplashScreen extends Activity {
 
-    private static final int CZAS = 15000;
+    private static final int CZAS = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

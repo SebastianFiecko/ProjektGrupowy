@@ -2,7 +2,7 @@
 <DbData>
     <Routes>
         <Route id="1" name="library"/>
-        <Route id="2" name="dean's office"/>
+        <Route id="2" name="Office"/>
         <Route id="3" name="Science Lab"/>
         <Route id="4" name="canteen"/>
         <Route id="5" name="toilet"/>
@@ -10,7 +10,7 @@
     </Routes>
 
     <Beacons>
-        <Beacon id="eti_01" infoText="library">
+        <Beacon id="eti_01" infoText="office">
             <RouteInfo routeId="1">Go straight on for twenty meters</RouteInfo>
             <RouteInfo routeId="2">Go straight on for ten metres and turn right</RouteInfo>
             <RouteInfo routeId="3">Go straight on for ten metres and turn left</RouteInfo>
@@ -25,15 +25,15 @@
             <RouteInfo routeId="5">Turn left and go for five meters</RouteInfo>
         </Beacon>
         <Beacon id="eti_03" infoText="cloakroom">
-            <RouteInfo routeId="1">Doors - enter the room, turn right</RouteInfo>
+            <RouteInfo routeId="1">Doors - enter the room</RouteInfo>
             <RouteInfo routeId="2">Elevator – come on in, choose first floor</RouteInfo>
             <RouteInfo routeId="3">Elevator – come on in, choose second floor</RouteInfo>
             <RouteInfo routeId="4">Get through the door and go straigh on for five meters</RouteInfo>
             <RouteInfo routeId="5">Men’s room on the left, go straight on for one meter to Women’ room</RouteInfo>
         </Beacon>
-        <Beacon id="eti_04" infoText="dean’s office">
-            <RouteInfo routeId="1">Library’s reception</RouteInfo>
-            <RouteInfo routeId="2"> Turn left, get through the door and turn left, go straight on for five meters, final destination on the left</RouteInfo>
+        <Beacon id="eti_04" infoText="library">
+            <RouteInfo routeId="1">Library's entrance</RouteInfo>
+            <RouteInfo routeId="2"> Turn right, get through the door, go straight on for ten meters, final destination in front of you</RouteInfo>
             <RouteInfo routeId="3"> Turn left, get through the door and turn left, go straight on for five meters, final destination on the left</RouteInfo>
             <RouteInfo routeId="4">Canteen’s cash desk</RouteInfo>
             <RouteInfo routeId="5">Women’s room</RouteInfo>

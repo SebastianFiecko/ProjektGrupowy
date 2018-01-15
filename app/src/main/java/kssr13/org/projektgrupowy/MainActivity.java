@@ -75,6 +75,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         dbHandler = new DbHandler();
         Realm.setDefaultConfiguration(dbHandler.getConfig());
 
+        XmlResourceParser parser = getResources().getXml(R.xml.db_initial_data);
+        dbHandler.initalize(parser);
+
         //capturedSpeechText = (TextView) findViewById(R.id.txtSpeechInput);
         //speechToTextButton = (ImageButton) findViewById(R.id.btnSpeak);
         informationButton = (Button) findViewById(R.id.informationButton);

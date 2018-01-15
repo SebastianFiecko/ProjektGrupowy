@@ -30,12 +30,14 @@ public class DbHandler {
     }
 
     public void initalize(XmlResourceParser parser) {
-        try {
-            dbInitializer.initialize(parser);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
+        if (realm.isEmpty()) {
+            try {
+                dbInitializer.initialize(parser);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
         }
     }
 
